@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TournamentHook } from '@/lib/useTournament';
 import GroupManager from '@/components/admin/GroupManager';
 import TeamManager from '@/components/admin/TeamManager';
@@ -14,17 +14,27 @@ export default function AdminView(props: TournamentHook) {
   const [authenticated, setAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('ldj_admin') === '1') setAuthenticated(true);
+  }, []);
   const [activeTab, setActiveTab] = useState<AdminTab>('matches');
   const [showReset, setShowReset] = useState(false);
 
   const login = () => {
     if (passwordInput === ADMIN_PASSWORD) {
       setAuthenticated(true);
+      localStorage.setItem('ldj_admin', '1');
       setError(false);
     } else {
       setError(true);
       setPasswordInput('');
     }
+  };
+
+  const logout = () => {
+    setAuthenticated(false);
+    localStorage.removeItem('ldj_admin');
   };
 
   if (!authenticated) {
@@ -75,7 +85,7 @@ export default function AdminView(props: TournamentHook) {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Administration</h1>
           <button
-            onClick={() => setAuthenticated(false)}
+            onClick={logout}
             className="text-xs text-gray-500 active:text-white"
           >
             Déconnexion
