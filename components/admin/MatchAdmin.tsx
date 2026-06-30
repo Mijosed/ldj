@@ -19,19 +19,29 @@ interface EventEditorProps {
 }
 
 function EventEditor({ type, events, homeTeamId, awayTeamId, teams, players, onChange }: EventEditorProps) {
-  const [newName, setNewName] = useState('');
+  const [newSelected, setNewSelected] = useState('');
+  const [newCustom, setNewCustom] = useState('');
   const [newTeam, setNewTeam] = useState(homeTeamId || '');
   const [newCount, setNewCount] = useState('1');
 
   const homeTeam = teams.find(t => t.id === homeTeamId);
   const awayTeam = teams.find(t => t.id === awayTeamId);
-  const currentPlayers = players.filter(p => p.teamId === newTeam);
+  const teamPlayers = players.filter(p => p.teamId === newTeam).sort((a, b) => a.name.localeCompare(b.name));
+  const isOther = newSelected === '__other__';
+  const resolvedName = isOther ? newCustom : newSelected;
 
   const add = () => {
-    if (!newName.trim() || !newTeam) return;
-    onChange([...events, { id: uid(), playerName: newName.trim(), teamId: newTeam, count: parseInt(newCount) || 1 }]);
-    setNewName('');
+    if (!resolvedName.trim() || !newTeam) return;
+    onChange([...events, { id: uid(), playerName: resolvedName.trim(), teamId: newTeam, count: parseInt(newCount) || 1 }]);
+    setNewSelected('');
+    setNewCustom('');
     setNewCount('1');
+  };
+
+  const handleTeamChange = (teamId: string) => {
+    setNewTeam(teamId);
+    setNewSelected('');
+    setNewCustom('');
   };
 
   const remove = (id: string) => onChange(events.filter(e => e.id !== id));
@@ -59,23 +69,24 @@ function EventEditor({ type, events, homeTeamId, awayTeamId, teams, players, onC
         })}
       </div>
       <div className="flex gap-1.5">
-        <select value={newTeam} onChange={e => setNewTeam(e.target.value)} className="bg-[#1a1a1a] border border-[#333] rounded-lg px-2 py-2 text-xs text-white focus:outline-none w-24 shrink-0">
+        <select value={newTeam} onChange={e => handleTeamChange(e.target.value)} className="bg-[#1a1a1a] border border-[#333] rounded-lg px-2 py-2 text-xs text-white focus:outline-none w-24 shrink-0">
           {!homeTeam && !awayTeam && <option value="">Équipe</option>}
           {homeTeam && <option value={homeTeamId}>{homeTeam.name}</option>}
           {awayTeam && <option value={awayTeamId}>{awayTeam.name}</option>}
         </select>
-        <div className="flex-1 relative">
-          <input
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && add()}
-            list={`${type}-players-${newTeam}`}
-            className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]"
-            placeholder="Joueur"
-          />
-          <datalist id={`${type}-players-${newTeam}`}>
-            {currentPlayers.map(p => <option key={p.id} value={p.name} />)}
-          </datalist>
+        <div className="flex-1 flex flex-col gap-1">
+          <select value={newSelected} onChange={e => setNewSelected(e.target.value)}
+            className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]">
+            <option value="">Joueur...</option>
+            {teamPlayers.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+            <option value="__other__">Autre (saisie libre)</option>
+          </select>
+          {isOther && (
+            <input value={newCustom} onChange={e => setNewCustom(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && add()}
+              className="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]"
+              placeholder="Nom du joueur" autoFocus />
+          )}
         </div>
         <input value={newCount} onChange={e => setNewCount(e.target.value)} type="number" min="1" max="10"
           className="w-10 bg-[#1a1a1a] border border-[#333] rounded-lg px-1 py-2 text-sm text-white text-center focus:outline-none" />
@@ -106,11 +117,14 @@ function MatchCard({ match, teams, players, updateMatch, onMoveUp, onMoveDown, i
   const [assisters, setAssisters] = useState<GoalEvent[]>(match.assisters);
   const [momName, setMomName] = useState(match.manOfMatch ?? '');
   const [momTeam, setMomTeam] = useState(match.manOfMatchTeamId ?? '');
+  const [momCustom, setMomCustom] = useState('');
 
   const isFinal = match.phase !== 'group';
   const home = teams.find(t => t.id === editHomeId);
   const away = teams.find(t => t.id === editAwayId);
-  const momPlayers = players.filter(p => p.teamId === momTeam);
+  const momPlayers = players.filter(p => p.teamId === momTeam).sort((a, b) => a.name.localeCompare(b.name));
+  const isMomOther = momName === '__other__';
+  const resolvedMomName = isMomOther ? momCustom : momName;
 
   const save = () => {
     const hs = parseInt(homeScore);
@@ -124,7 +138,7 @@ function MatchCard({ match, teams, players, updateMatch, onMoveUp, onMoveDown, i
       played,
       scorers,
       assisters,
-      manOfMatch: momName.trim() || undefined,
+      manOfMatch: resolvedMomName.trim() || undefined,
       manOfMatchTeamId: momTeam || undefined,
     });
     setExpanded(false);
@@ -137,7 +151,7 @@ function MatchCard({ match, teams, players, updateMatch, onMoveUp, onMoveDown, i
       ...(isFinal ? { homeTeamId: '', awayTeamId: '' } : {}),
     });
     setHomeScore(''); setAwayScore(''); setScorers([]); setAssisters([]);
-    setMomName(''); setMomTeam('');
+    setMomName(''); setMomTeam(''); setMomCustom('');
     if (isFinal) { setEditHomeId(''); setEditAwayId(''); }
     setExpanded(false);
   };
@@ -243,23 +257,24 @@ function MatchCard({ match, teams, players, updateMatch, onMoveUp, onMoveDown, i
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block mb-2">🏅 Homme du Match</label>
             <div className="flex gap-2">
-              <select value={momTeam} onChange={e => setMomTeam(e.target.value)}
+              <select value={momTeam} onChange={e => { setMomTeam(e.target.value); setMomName(''); setMomCustom(''); }}
                 className="bg-[#1a1a1a] border border-[#333] rounded-lg px-2 py-2 text-xs text-white focus:outline-none w-24 shrink-0">
                 <option value="">Équipe</option>
                 {home && <option value={editHomeId}>{home.name}</option>}
                 {away && <option value={editAwayId}>{away.name}</option>}
               </select>
-              <div className="flex-1 relative">
-                <input
-                  value={momName}
-                  onChange={e => setMomName(e.target.value)}
-                  list={`mom-players-${momTeam}`}
-                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]"
-                  placeholder="Nom du joueur"
-                />
-                <datalist id={`mom-players-${momTeam}`}>
-                  {momPlayers.map(p => <option key={p.id} value={p.name} />)}
-                </datalist>
+              <div className="flex-1 flex flex-col gap-1">
+                <select value={momName} onChange={e => setMomName(e.target.value)}
+                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]">
+                  <option value="">Joueur...</option>
+                  {momPlayers.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+                  <option value="__other__">Autre (saisie libre)</option>
+                </select>
+                {isMomOther && (
+                  <input value={momCustom} onChange={e => setMomCustom(e.target.value)}
+                    className="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-2.5 py-2 text-sm text-white focus:outline-none focus:border-[#555]"
+                    placeholder="Nom du joueur" autoFocus />
+                )}
               </div>
             </div>
           </div>
