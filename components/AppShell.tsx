@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TournamentState, Team, Player, Match, Tab } from '@/lib/types';
+import { TournamentState, Team, Player, Match, Tab, TournamentAwards } from '@/lib/types';
 import BottomNav from '@/components/BottomNav';
 import HomeView from '@/components/views/HomeView';
 import MatchesView from '@/components/views/MatchesView';
@@ -15,6 +15,7 @@ import {
   removePlayerAction,
   updateMatchAction,
   swapMatchOrderAction,
+  updateAwardsAction,
   resetTournamentAction,
 } from '@/app/actions';
 
@@ -64,6 +65,11 @@ export default function AppShell({ initialState: serverState }: { initialState: 
     swapMatchOrderAction(matchId1, matchId2);
   };
 
+  const updateAwards = (awards: TournamentAwards) => {
+    setState(s => ({ ...s, awards }));
+    updateAwardsAction(awards);
+  };
+
   const resetData = () => {
     setState(s => ({
       ...s,
@@ -82,7 +88,7 @@ export default function AppShell({ initialState: serverState }: { initialState: 
     resetTournamentAction();
   };
 
-  const tournament = { state, loaded: true, updateTeam, addPlayer, updatePlayer, removePlayer, updateMatch, swapMatchOrder, resetData };
+  const tournament = { state, loaded: true, updateTeam, addPlayer, updatePlayer, removePlayer, updateMatch, swapMatchOrder, updateAwards, resetData };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">

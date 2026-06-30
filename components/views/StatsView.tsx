@@ -1,10 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { TournamentHook } from '@/lib/useTournament';
 import TeamLogo from '@/components/TeamLogo';
 import { computeScorerStats, computeAssisterStats, computeDefenseStats } from '@/lib/utils';
+import TropheesView from '@/components/views/TropheesView';
 
-export default function StatsView({ state }: TournamentHook) {
+export default function StatsView(props: TournamentHook) {
+  const [subTab, setSubTab] = useState<'stats' | 'trophees'>('stats');
+  const { state } = props;
+
   const { teams, matches } = state;
 
   const scorers = computeScorerStats(matches).slice(0, 10);
@@ -50,10 +55,18 @@ export default function StatsView({ state }: TournamentHook) {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="px-4 pt-6 pb-4 bg-[#111] border-b border-[#1e1e1e]">
-        <h1 className="text-xl font-bold">Statistiques</h1>
+        <div className="flex gap-2">
+          {(['stats', 'trophees'] as const).map(t => (
+            <button key={t} onClick={() => setSubTab(t)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold ${subTab === t ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-400'}`}>
+              {t === 'stats' ? 'Stats' : 'Trophées'}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="px-4 py-5 space-y-6">
+      {subTab === 'trophees' && <div className="px-4 py-5"><TropheesView {...props} /></div>}
+      {subTab === 'stats' && <div className="px-4 py-5 space-y-6">
         {/* Buteurs */}
         <section>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -134,7 +147,7 @@ export default function StatsView({ state }: TournamentHook) {
             )}
           </div>
         </section>
-      </div>
+      </div>}
     </div>
   );
 }

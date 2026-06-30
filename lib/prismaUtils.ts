@@ -1,6 +1,6 @@
 import type { Team as DbTeam, Player as DbPlayer, Match as DbMatch } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { TournamentState, Team, Player, Match, Group, MatchGroup, MatchPhase, GoalEvent } from './types';
+import { TournamentState, Team, Player, Match, Group, MatchGroup, MatchPhase, GoalEvent, TournamentAwards, emptyAwards } from './types';
 import { prisma } from './db';
 import { initialState } from './initialData';
 
@@ -57,15 +57,17 @@ export async function ensureSeeded() {
 
 export async function loadState(): Promise<TournamentState> {
   await ensureSeeded();
-  const [teams, players, matches] = await Promise.all([
+  const [teams, players, matches, config] = await Promise.all([
     prisma.team.findMany(),
     prisma.player.findMany(),
     prisma.match.findMany(),
+    prisma.config.findUnique({ where: { id: 'singleton' } }),
   ]);
   return {
     teams: teams.map(toTeam),
     players: players.map(toPlayer),
     matches: matches.map(toMatch).sort((a, b) => a.order - b.order),
+    awards: (config?.awards as unknown as TournamentAwards) ?? emptyAwards,
   };
 }
 

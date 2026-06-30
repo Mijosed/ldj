@@ -1,4 +1,4 @@
-import { TournamentState, Team, Player, Match } from './types';
+import { TournamentState, Team, Player, Match, TournamentAwards } from './types';
 
 export interface TournamentHook {
   state: TournamentState;
@@ -9,5 +9,6 @@ export interface TournamentHook {
   removePlayer: (playerId: string) => void;
   updateMatch: (matchId: string, updates: Partial<Match>) => void;
   swapMatchOrder: (matchId1: string, matchId2: string) => void;
+  updateAwards: (awards: TournamentAwards) => void;
   resetData: () => void;
 }

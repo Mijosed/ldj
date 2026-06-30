@@ -41,10 +41,32 @@ export interface Match {
   manOfMatchTeamId?: string;
 }
 
+export interface TrophyPlayer {
+  playerName: string;
+  teamId: string;
+}
+
+export interface TournamentAwards {
+  ballonDor: TrophyPlayer | null;
+  meilleureGardien: TrophyPlayer | null;
+  goldenBoy: TrophyPlayer | null;
+  puskas: TrophyPlayer | null;
+  toty: TrophyPlayer[];
+}
+
+export const emptyAwards: TournamentAwards = {
+  ballonDor: null,
+  meilleureGardien: null,
+  goldenBoy: null,
+  puskas: null,
+  toty: [],
+};
+
 export interface TournamentState {
   teams: Team[];
   players: Player[];
   matches: Match[];
+  awards: TournamentAwards;
 }
 
 export interface StandingsRow {

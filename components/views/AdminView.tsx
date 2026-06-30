@@ -5,10 +5,11 @@ import { TournamentHook } from '@/lib/useTournament';
 import GroupManager from '@/components/admin/GroupManager';
 import TeamManager from '@/components/admin/TeamManager';
 import MatchAdmin from '@/components/admin/MatchAdmin';
+import TrophyAdmin from '@/components/admin/TrophyAdmin';
 
-const ADMIN_PASSWORD = 'LDJ2026';
+const ADMIN_PASSWORD = 'TEKPONEN';
 
-type AdminTab = 'teams' | 'groups' | 'matches';
+type AdminTab = 'teams' | 'groups' | 'matches' | 'trophees';
 
 export default function AdminView(props: TournamentHook) {
   const [authenticated, setAuthenticated] = useState(false);
@@ -76,6 +77,7 @@ export default function AdminView(props: TournamentHook) {
     { id: 'matches', label: 'Matchs' },
     { id: 'teams', label: 'Équipes' },
     { id: 'groups', label: 'Poules' },
+    { id: 'trophees', label: '🏅' },
   ];
 
   return (
@@ -112,6 +114,7 @@ export default function AdminView(props: TournamentHook) {
         {activeTab === 'matches' && <MatchAdmin {...props} />}
         {activeTab === 'teams' && <TeamManager {...props} />}
         {activeTab === 'groups' && <GroupManager {...props} />}
+        {activeTab === 'trophees' && <TrophyAdmin {...props} />}
 
         {/* Danger zone */}
         <div className="mt-8 border-t border-[#222] pt-6">

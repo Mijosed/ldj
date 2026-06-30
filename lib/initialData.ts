@@ -1,4 +1,4 @@
-import { TournamentState, Team, Match, Group, MatchPhase } from './types';
+import { TournamentState, Team, Match, Group, MatchPhase, emptyAwards } from './types';
 
 const TEAMS: Team[] = [
   { id: '100_blaze', name: '100 Blaze', logo: '100_blaze.jpeg', group: 'A' },
@@ -76,4 +76,5 @@ export const initialState: TournamentState = {
   teams: TEAMS,
   players: [],
   matches: [...generateGroupMatches(DEFAULT_GROUP_A, DEFAULT_GROUP_B), ...FINAL_MATCHES],
+  awards: emptyAwards,
 };

@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db';
 import { resetMatchScores } from '@/lib/prismaUtils';
 import { Prisma } from '@prisma/client';
-import { Team, Player, Match, Group } from '@/lib/types';
+import { Team, Player, Match, Group, TournamentAwards } from '@/lib/types';
 import { generateGroupMatches } from '@/lib/initialData';
 
 export async function updateTeamAction(teamId: string, updates: Partial<Team>) {
@@ -50,6 +50,14 @@ export async function swapMatchOrderAction(matchId1: string, matchId2: string) {
     prisma.match.update({ where: { id: matchId1 }, data: { order: m2.order } }),
     prisma.match.update({ where: { id: matchId2 }, data: { order: m1.order } }),
   ]);
+}
+
+export async function updateAwardsAction(awards: TournamentAwards) {
+  await prisma.config.upsert({
+    where: { id: 'singleton' },
+    update: { awards: awards as unknown as Prisma.InputJsonValue },
+    create: { id: 'singleton', awards: awards as unknown as Prisma.InputJsonValue },
+  });
 }
 
 export async function resetTournamentAction() {
