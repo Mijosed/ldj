@@ -334,50 +334,65 @@ export default function MatchAdmin({ state, updateMatch, swapMatchOrder }: Tourn
     return true;
   });
 
+  const [openingOpen, setOpeningOpen] = useState(false);
+
   return (
     <div className="space-y-3">
       {/* Opening match config */}
-      <div className="bg-[#161616] border border-[#222] rounded-xl p-3 space-y-3">
-        <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Match d'ouverture</p>
+      <div className="bg-[#161616] border border-[#222] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setOpeningOpen(o => !o)}
+          className="w-full flex items-center justify-between px-3 py-3 active:opacity-70"
+        >
+          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Match d'ouverture</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5"
+            className={`transition-transform ${openingOpen ? 'rotate-180' : ''}`}>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
 
-        {/* Group selector */}
-        <div>
-          <p className="text-[10px] text-gray-600 mb-1.5">1. Poule qui commence</p>
-          <div className="flex gap-2">
-            {(['A', 'B'] as Group[]).map(g => (
-              <button key={g} onClick={() => handleGroupChange(g)} disabled={isPending}
-                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${pendingGroup === g ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-400'} disabled:opacity-40`}>
-                Poule {g}
-              </button>
-            ))}
+        {openingOpen && (
+          <div className="px-3 pb-3 space-y-3 border-t border-[#222]">
+            {/* Group selector */}
+            <div className="pt-3">
+              <p className="text-[10px] text-gray-600 mb-1.5">1. Poule qui commence</p>
+              <div className="flex gap-2">
+                {(['A', 'B'] as Group[]).map(g => (
+                  <button key={g} onClick={() => handleGroupChange(g)} disabled={isPending}
+                    className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${pendingGroup === g ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-400'} disabled:opacity-40`}>
+                    Poule {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Opening match selector */}
+            <div>
+              <p className="text-[10px] text-gray-600 mb-1.5">2. Premier match</p>
+              <div className="space-y-1.5">
+                {round1Candidates.map(m => {
+                  const home = teams.find(t => t.id === m.homeTeamId);
+                  const away = teams.find(t => t.id === m.awayTeamId);
+                  const isActive = pendingGroup === currentStartGroup && m.id === currentOpeningMatchId;
+                  return (
+                    <button key={m.id} disabled={isPending}
+                      onClick={() => handleReorder(pendingGroup, m.id)}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 ${isActive ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-300 active:opacity-70'}`}>
+                      {home && <TeamLogo team={home} size={20} />}
+                      <span className="truncate">{home?.name ?? '?'}</span>
+                      <span className={`text-xs mx-1 ${isActive ? 'text-gray-500' : 'text-gray-600'}`}>vs</span>
+                      <span className="truncate">{away?.name ?? '?'}</span>
+                      {away && <TeamLogo team={away} size={20} />}
+                      {isPending && <span className="ml-auto text-xs">...</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="text-[10px] text-gray-600">Les 30 matchs s'alternent ensuite A↔B automatiquement</p>
           </div>
-        </div>
-
-        {/* Opening match selector */}
-        <div>
-          <p className="text-[10px] text-gray-600 mb-1.5">2. Premier match</p>
-          <div className="space-y-1.5">
-            {round1Candidates.map(m => {
-              const home = teams.find(t => t.id === m.homeTeamId);
-              const away = teams.find(t => t.id === m.awayTeamId);
-              const isActive = pendingGroup === currentStartGroup && m.id === currentOpeningMatchId;
-              return (
-                <button key={m.id} disabled={isPending}
-                  onClick={() => handleReorder(pendingGroup, m.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 ${isActive ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-300 active:opacity-70'}`}>
-                  {home && <TeamLogo team={home} size={20} />}
-                  <span className="truncate">{home?.name ?? '?'}</span>
-                  <span className={`text-xs mx-1 ${isActive ? 'text-gray-500' : 'text-gray-600'}`}>vs</span>
-                  <span className="truncate">{away?.name ?? '?'}</span>
-                  {away && <TeamLogo team={away} size={20} />}
-                  {isPending && <span className="ml-auto text-xs">...</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <p className="text-[10px] text-gray-600">Les 30 matchs s'alternent ensuite A↔B automatiquement</p>
+        )}
       </div>
 
       {/* Filters */}
