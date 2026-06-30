@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { TournamentState, Team, Player, Match, Tab } from '@/lib/types';
-import { initialState } from '@/lib/initialData';
 import BottomNav from '@/components/BottomNav';
 import HomeView from '@/components/views/HomeView';
 import MatchesView from '@/components/views/MatchesView';
@@ -66,7 +65,20 @@ export default function AppShell({ initialState: serverState }: { initialState: 
   };
 
   const resetData = () => {
-    setState(initialState);
+    setState(s => ({
+      ...s,
+      matches: s.matches.map(m => ({
+        ...m,
+        homeScore: null,
+        awayScore: null,
+        played: false,
+        scorers: [],
+        assisters: [],
+        manOfMatch: undefined,
+        manOfMatchTeamId: undefined,
+        ...(m.phase !== 'group' ? { homeTeamId: '', awayTeamId: '' } : {}),
+      })),
+    }));
     resetTournamentAction();
   };
 

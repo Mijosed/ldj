@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { TournamentHook } from '@/lib/useTournament';
 import TeamLogo from '@/components/TeamLogo';
-import { Match, GoalEvent } from '@/lib/types';
+import { Match, GoalEvent, Group } from '@/lib/types';
 import { uid, getMatchLabel } from '@/lib/utils';
+import { reorderGroupMatchesAction } from '@/app/actions';
 
 type EventType = 'scorer' | 'assister';
 
@@ -294,6 +296,33 @@ export default function MatchAdmin({ state, updateMatch, swapMatchOrder }: Tourn
   const { teams, matches, players } = state;
   const [filter, setFilter] = useState<'all' | 'A' | 'B' | 'finale'>('all');
   const [showPlayed, setShowPlayed] = useState(true);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const sortedGroupMatches = [...matches]
+    .filter(m => m.phase === 'group')
+    .sort((a, b) => a.order - b.order);
+  const firstGroupMatch = sortedGroupMatches[0];
+  const currentStartGroup: Group = (firstGroupMatch?.group as Group) ?? 'A';
+  const currentOpeningMatchId = firstGroupMatch?.id ?? '';
+
+  const [pendingGroup, setPendingGroup] = useState<Group>(currentStartGroup);
+
+  // Round-1 matches of the pending starting group (the 3 candidates for opener)
+  const round1Candidates = matches
+    .filter(m => m.phase === 'group' && m.round === 1 && m.group === pendingGroup)
+    .sort((a, b) => a.order - b.order);
+
+  const handleReorder = (startGroup: Group, openingMatchId: string) => {
+    startTransition(async () => {
+      await reorderGroupMatchesAction(startGroup, openingMatchId);
+      router.refresh();
+    });
+  };
+
+  const handleGroupChange = (g: Group) => {
+    setPendingGroup(g);
+  };
 
   const sorted = [...matches].sort((a, b) => a.order - b.order);
 
@@ -307,6 +336,50 @@ export default function MatchAdmin({ state, updateMatch, swapMatchOrder }: Tourn
 
   return (
     <div className="space-y-3">
+      {/* Opening match config */}
+      <div className="bg-[#161616] border border-[#222] rounded-xl p-3 space-y-3">
+        <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Match d'ouverture</p>
+
+        {/* Group selector */}
+        <div>
+          <p className="text-[10px] text-gray-600 mb-1.5">1. Poule qui commence</p>
+          <div className="flex gap-2">
+            {(['A', 'B'] as Group[]).map(g => (
+              <button key={g} onClick={() => handleGroupChange(g)} disabled={isPending}
+                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${pendingGroup === g ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-400'} disabled:opacity-40`}>
+                Poule {g}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Opening match selector */}
+        <div>
+          <p className="text-[10px] text-gray-600 mb-1.5">2. Premier match</p>
+          <div className="space-y-1.5">
+            {round1Candidates.map(m => {
+              const home = teams.find(t => t.id === m.homeTeamId);
+              const away = teams.find(t => t.id === m.awayTeamId);
+              const isActive = pendingGroup === currentStartGroup && m.id === currentOpeningMatchId;
+              return (
+                <button key={m.id} disabled={isPending}
+                  onClick={() => handleReorder(pendingGroup, m.id)}
+                  className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 ${isActive ? 'bg-white text-black' : 'bg-[#1e1e1e] text-gray-300 active:opacity-70'}`}>
+                  {home && <TeamLogo team={home} size={20} />}
+                  <span className="truncate">{home?.name ?? '?'}</span>
+                  <span className={`text-xs mx-1 ${isActive ? 'text-gray-500' : 'text-gray-600'}`}>vs</span>
+                  <span className="truncate">{away?.name ?? '?'}</span>
+                  {away && <TeamLogo team={away} size={20} />}
+                  {isPending && <span className="ml-auto text-xs">...</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <p className="text-[10px] text-gray-600">Les 30 matchs s'alternent ensuite A↔B automatiquement</p>
+      </div>
+
       {/* Filters */}
       <div className="flex gap-1.5 flex-wrap">
         {(['all', 'A', 'B', 'finale'] as const).map(f => (

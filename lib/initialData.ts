@@ -23,34 +23,40 @@ const PAIRINGS: [number, number][][] = [
   [[0, 1], [2, 5], [3, 4]],
 ];
 
-function generateGroupMatches(): Match[] {
-  const groupA = ['100_blaze', 'all_stars', 'aura_city', 'fc_city', 'racing_club', 'valar_morghulis'];
-  const groupB = ['100_peine', 'b5_city', 'fc_havana', 'squadra_azzura', 'vlg', 'xpti'];
-
+export function generateGroupMatches(
+  groupATeams: string[],
+  groupBTeams: string[],
+  startGroup: Group = 'A',
+): Match[] {
   const matches: Match[] = [];
   let matchId = 1;
   let order = 1;
 
   for (let round = 0; round < 5; round++) {
-    for (const group of ['A', 'B'] as Group[]) {
-      const teamIds = group === 'A' ? groupA : groupB;
-      for (const [homeIdx, awayIdx] of PAIRINGS[round]) {
-        matches.push({
-          id: `match_${matchId++}`,
-          homeTeamId: teamIds[homeIdx],
-          awayTeamId: teamIds[awayIdx],
-          homeScore: null,
-          awayScore: null,
-          played: false,
-          scorers: [],
-          assisters: [],
-          group,
-          round: round + 1,
-          order: order++,
-          phase: 'group',
-        });
-      }
+    const aMatches: Match[] = [];
+    const bMatches: Match[] = [];
+
+    for (const [homeIdx, awayIdx] of PAIRINGS[round]) {
+      aMatches.push({
+        id: `match_${matchId++}`, homeTeamId: groupATeams[homeIdx], awayTeamId: groupATeams[awayIdx],
+        homeScore: null, awayScore: null, played: false, scorers: [], assisters: [],
+        group: 'A', round: round + 1, order: 0, phase: 'group',
+      });
+      bMatches.push({
+        id: `match_${matchId++}`, homeTeamId: groupBTeams[homeIdx], awayTeamId: groupBTeams[awayIdx],
+        homeScore: null, awayScore: null, played: false, scorers: [], assisters: [],
+        group: 'B', round: round + 1, order: 0, phase: 'group',
+      });
     }
+
+    const first = startGroup === 'A' ? aMatches : bMatches;
+    const second = startGroup === 'A' ? bMatches : aMatches;
+    for (let i = 0; i < 3; i++) {
+      first[i].order = order++;
+      second[i].order = order++;
+    }
+
+    matches.push(...aMatches, ...bMatches);
   }
 
   return matches;
@@ -63,8 +69,11 @@ const FINAL_MATCHES: Match[] = [
   { id: 'grand_final', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 34, phase: 'final' },
 ];
 
+const DEFAULT_GROUP_A = ['100_blaze', 'all_stars', 'aura_city', 'fc_city', 'racing_club', 'valar_morghulis'];
+const DEFAULT_GROUP_B = ['100_peine', 'b5_city', 'fc_havana', 'squadra_azzura', 'vlg', 'xpti'];
+
 export const initialState: TournamentState = {
   teams: TEAMS,
   players: [],
-  matches: [...generateGroupMatches(), ...FINAL_MATCHES],
+  matches: [...generateGroupMatches(DEFAULT_GROUP_A, DEFAULT_GROUP_B), ...FINAL_MATCHES],
 };

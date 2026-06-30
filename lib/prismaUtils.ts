@@ -69,17 +69,27 @@ export async function loadState(): Promise<TournamentState> {
   };
 }
 
-export async function reseedTournament() {
-  await prisma.player.deleteMany();
-  await prisma.match.deleteMany();
-  await Promise.all(
-    initialState.teams.map(t =>
-      prisma.team.upsert({
-        where: { id: t.id },
-        update: { name: t.name, logo: t.logo, group: t.group },
-        create: t,
-      })
-    )
-  );
-  await prisma.match.createMany({ data: initialState.matches.map(matchCreateData) });
+export async function resetMatchScores() {
+  const emptyJson = [] as unknown as Prisma.InputJsonValue;
+  await prisma.$transaction([
+    // Reset group matches: keep teams & order, wipe scores/events
+    prisma.match.updateMany({
+      where: { phase: 'group' },
+      data: {
+        homeScore: null, awayScore: null, played: false,
+        scorers: emptyJson, assisters: emptyJson,
+        manOfMatch: null, manOfMatchTeamId: null,
+      },
+    }),
+    // Reset final matches: also clear the qualified teams (back to TBD)
+    prisma.match.updateMany({
+      where: { phase: { not: 'group' } },
+      data: {
+        homeTeamId: '', awayTeamId: '',
+        homeScore: null, awayScore: null, played: false,
+        scorers: emptyJson, assisters: emptyJson,
+        manOfMatch: null, manOfMatchTeamId: null,
+      },
+    }),
+  ]);
 }
