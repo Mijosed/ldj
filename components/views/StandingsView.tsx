@@ -34,16 +34,16 @@ function GroupTable({ group, state }: { group: Group; state: TournamentHook['sta
         {rows.map((row, idx) => {
           const team = teams.find(t => t.id === row.teamId);
           if (!team) return null;
-          const isTop2 = idx < 2;
+          const isTop4 = idx < 4;
 
           return (
             <div
               key={row.teamId}
               className={`flex items-center px-3 py-2.5 border-b border-[#1a1a1a] last:border-0 ${
-                isTop2 ? 'bg-[#1a1f1a]' : ''
+                isTop4 ? 'bg-[#1a1f1a]' : ''
               }`}
             >
-              <span className={`w-6 text-center text-sm font-bold ${isTop2 ? 'text-green-400' : 'text-gray-600'}`}>
+              <span className={`w-6 text-center text-sm font-bold ${isTop4 ? 'text-green-400' : 'text-gray-600'}`}>
                 {idx + 1}
               </span>
               <div className="flex items-center gap-2 flex-1 ml-2 min-w-0">
@@ -67,7 +67,7 @@ function GroupTable({ group, state }: { group: Group; state: TournamentHook['sta
         )}
       </div>
 
-      <p className="text-[10px] text-gray-700 mt-1.5 ml-1">Les 2 premiers se qualifient</p>
+      <p className="text-[10px] text-gray-700 mt-1.5 ml-1">Les 4 premiers se qualifient</p>
     </section>
   );
 }

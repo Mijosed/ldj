@@ -63,10 +63,14 @@ export function generateGroupMatches(
 }
 
 const FINAL_MATCHES: Match[] = [
-  { id: 'sf1', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 31, phase: 'semifinal' },
-  { id: 'sf2', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 32, phase: 'semifinal' },
-  { id: 'third_place', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 33, phase: 'third_place' },
-  { id: 'grand_final', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 34, phase: 'final' },
+  { id: 'qf1', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 31, phase: 'quarterfinal' },
+  { id: 'qf2', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 32, phase: 'quarterfinal' },
+  { id: 'qf3', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 33, phase: 'quarterfinal' },
+  { id: 'qf4', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 34, phase: 'quarterfinal' },
+  { id: 'sf1', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 35, phase: 'semifinal' },
+  { id: 'sf2', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 36, phase: 'semifinal' },
+  { id: 'third_place', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 37, phase: 'third_place' },
+  { id: 'grand_final', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [], assisters: [], group: 'F', round: 0, order: 38, phase: 'final' },
 ];
 
 const DEFAULT_GROUP_A = ['100_blaze', 'all_stars', 'aura_city', 'fc_city', 'racing_club', 'valar_morghulis'];

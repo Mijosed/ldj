@@ -55,8 +55,32 @@ export async function ensureSeeded() {
   await prisma.match.createMany({ data: initialState.matches.map(matchCreateData) });
 }
 
+// Migrates old 4-match final structure to new 8-match structure (adds QF round)
+async function syncFinalMatches() {
+  const qf1 = await prisma.match.findUnique({ where: { id: 'qf1' } });
+  if (qf1) return; // already migrated
+
+  await prisma.$transaction([
+    // Add 4 quarterfinal matches
+    prisma.match.createMany({
+      data: [
+        { id: 'qf1', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [] as unknown as Prisma.InputJsonValue, assisters: [] as unknown as Prisma.InputJsonValue, group: 'F', round: 0, order: 31, phase: 'quarterfinal' },
+        { id: 'qf2', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [] as unknown as Prisma.InputJsonValue, assisters: [] as unknown as Prisma.InputJsonValue, group: 'F', round: 0, order: 32, phase: 'quarterfinal' },
+        { id: 'qf3', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [] as unknown as Prisma.InputJsonValue, assisters: [] as unknown as Prisma.InputJsonValue, group: 'F', round: 0, order: 33, phase: 'quarterfinal' },
+        { id: 'qf4', homeTeamId: '', awayTeamId: '', homeScore: null, awayScore: null, played: false, scorers: [] as unknown as Prisma.InputJsonValue, assisters: [] as unknown as Prisma.InputJsonValue, group: 'F', round: 0, order: 34, phase: 'quarterfinal' },
+      ],
+    }),
+    // Update semis and beyond to new orders
+    prisma.match.update({ where: { id: 'sf1' }, data: { order: 35 } }),
+    prisma.match.update({ where: { id: 'sf2' }, data: { order: 36 } }),
+    prisma.match.update({ where: { id: 'third_place' }, data: { order: 37 } }),
+    prisma.match.update({ where: { id: 'grand_final' }, data: { order: 38 } }),
+  ]);
+}
+
 export async function loadState(): Promise<TournamentState> {
   await ensureSeeded();
+  await syncFinalMatches();
   const [teams, players, matches, config] = await Promise.all([
     prisma.team.findMany(),
     prisma.player.findMany(),

@@ -155,6 +155,7 @@ function FinaleView({ state }: { state: TournamentHook['state'] }) {
   const { teams, matches } = state;
   const finalMatches = [...matches].filter(m => m.phase !== 'group').sort((a, b) => a.order - b.order);
 
+  const quarters = finalMatches.filter(m => m.phase === 'quarterfinal');
   const semis = finalMatches.filter(m => m.phase === 'semifinal');
   const thirdPlace = finalMatches.find(m => m.phase === 'third_place');
   const grand = finalMatches.find(m => m.phase === 'final');
@@ -174,21 +175,38 @@ function FinaleView({ state }: { state: TournamentHook['state'] }) {
     <div className="space-y-6">
       <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-3 text-center">
         <p className="text-xs text-gray-500">Phase finale — Jour 2</p>
-        <p className="text-[11px] text-gray-700 mt-1">Top 2 de chaque groupe se qualifient</p>
+        <p className="text-[11px] text-gray-700 mt-1">Top 4 de chaque groupe se qualifient</p>
       </div>
 
+      {/* Quarts de finale */}
+      {quarters.length > 0 && (
+        <section>
+          <SectionHeader title="Quarts de finale" subtitle="Jour 2 — Matin" />
+          <div className="space-y-2">
+            {quarters.map((match, i) => (
+              <div key={match.id}>
+                <p className="text-[10px] font-semibold text-gray-600 mb-1.5 ml-1">QF {i + 1}</p>
+                <MatchCard match={match} teams={teams} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Demi-finales */}
-      <section>
-        <SectionHeader title="Demi-finales" subtitle="Jour 2 — Matin" />
-        <div className="space-y-2">
-          {semis.map((match, i) => (
-            <div key={match.id}>
-              <p className="text-[10px] font-semibold text-gray-600 mb-1.5 ml-1">Demi-finale {i + 1}</p>
-              <MatchCard match={match} teams={teams} />
-            </div>
-          ))}
-        </div>
-      </section>
+      {semis.length > 0 && (
+        <section>
+          <SectionHeader title="Demi-finales" subtitle="Jour 2 — Après-midi" />
+          <div className="space-y-2">
+            {semis.map((match, i) => (
+              <div key={match.id}>
+                <p className="text-[10px] font-semibold text-gray-600 mb-1.5 ml-1">Demi-finale {i + 1}</p>
+                <MatchCard match={match} teams={teams} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Petite finale */}
       {thirdPlace && (

@@ -1,6 +1,6 @@
 export type Group = 'A' | 'B';
 export type MatchGroup = Group | 'F';
-export type MatchPhase = 'group' | 'semifinal' | 'third_place' | 'final';
+export type MatchPhase = 'group' | 'quarterfinal' | 'semifinal' | 'third_place' | 'final';
 export type Tab = 'home' | 'matches' | 'standings' | 'stats' | 'admin';
 
 export interface Player {

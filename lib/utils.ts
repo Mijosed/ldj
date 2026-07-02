@@ -95,6 +95,10 @@ export function computeDefenseStats(teams: Team[], matches: Match[]): { teamId: 
 export function getMatchLabel(match: Match): string {
   if (match.phase === 'group') return `G${match.group} · J${match.round}`;
   const labels: Record<string, string> = {
+    qf1: 'Quart de finale 1',
+    qf2: 'Quart de finale 2',
+    qf3: 'Quart de finale 3',
+    qf4: 'Quart de finale 4',
     sf1: 'Demi-finale 1',
     sf2: 'Demi-finale 2',
     third_place: '3ème Place',
