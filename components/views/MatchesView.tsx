@@ -43,8 +43,9 @@ function MatchCard({ match, teams }: { match: Match; teams: TournamentHook['stat
   return (
     <div className="bg-[#161616] border border-[#222] rounded-xl p-3">
       {time && (
-        <p className="text-[10px] font-bold text-gray-600 mb-2">
-          🕐 {time} {match.played && <span className="text-green-600 font-normal">— Terminé</span>}
+        <p className="text-[10px] text-gray-500 mb-2 text-center">
+          Début de la rencontre : <span className="font-bold text-gray-300">{time}</span>
+          {match.played && <span className="text-green-600 font-normal"> — Terminé</span>}
         </p>
       )}
       <div className="flex items-center gap-2">
