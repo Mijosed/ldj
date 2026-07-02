@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { TournamentHook } from '@/lib/useTournament';
 import TeamLogo from '@/components/TeamLogo';
-import { getMatchLabel } from '@/lib/utils';
+import { getMatchLabel, getMatchTime } from '@/lib/utils';
 
 export default function HomeView({ state }: TournamentHook) {
   const { teams, matches } = state;
@@ -70,9 +70,13 @@ export default function HomeView({ state }: TournamentHook) {
                 const home = getTeam(match.homeTeamId);
                 const away = getTeam(match.awayTeamId);
                 const label = getMatchLabel(match);
+                const time = getMatchTime(match);
                 return (
                   <div key={match.id} className="bg-[#161616] border border-[#222] rounded-xl p-3 flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-gray-600 bg-[#1e1e1e] px-2 py-0.5 rounded shrink-0">{label}</span>
+                    <div className="shrink-0 text-center">
+                      <span className="text-[10px] font-bold text-gray-600 bg-[#1e1e1e] px-2 py-0.5 rounded block">{label}</span>
+                      {time && <span className="text-[10px] font-bold text-gray-500 mt-0.5 block">🕐 {time}</span>}
+                    </div>
                     <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {home ? <><TeamLogo team={home} size={26} /><span className="text-sm font-medium truncate">{home.name}</span></> : <span className="text-sm text-gray-600">À qualifier</span>}

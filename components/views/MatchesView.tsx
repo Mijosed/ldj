@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { TournamentHook } from '@/lib/useTournament';
 import TeamLogo from '@/components/TeamLogo';
 import { Match, Group } from '@/lib/types';
-import { getMatchLabel } from '@/lib/utils';
+import { getMatchLabel, getMatchTime } from '@/lib/utils';
 
 type MainTab = 'poules' | 'finale';
 type GroupFilter = 'all' | Group;
@@ -38,9 +38,15 @@ function MatchCard({ match, teams }: { match: Match; teams: TournamentHook['stat
   const homeWon = match.played && (match.homeScore ?? 0) > (match.awayScore ?? 0);
   const awayWon = match.played && (match.awayScore ?? 0) > (match.homeScore ?? 0);
   const momTeam = teams.find(t => t.id === match.manOfMatchTeamId);
+  const time = getMatchTime(match);
 
   return (
     <div className="bg-[#161616] border border-[#222] rounded-xl p-3">
+      {time && (
+        <p className="text-[10px] font-bold text-gray-600 mb-2">
+          🕐 {time} {match.played && <span className="text-green-600 font-normal">— Terminé</span>}
+        </p>
+      )}
       <div className="flex items-center gap-2">
         {/* Home */}
         <div className="flex items-center gap-1.5 flex-1 min-w-0">

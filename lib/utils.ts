@@ -103,6 +103,14 @@ export function getMatchLabel(match: Match): string {
   return labels[match.id] || match.phase;
 }
 
+export function getMatchTime(match: Match): string | null {
+  if (match.phase !== 'group') return null;
+  const total = 13 * 60 + 30 + (match.order - 1) * 15;
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${h}h${m.toString().padStart(2, '0')}`;
+}
+
 export function uid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
