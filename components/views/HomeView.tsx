@@ -130,7 +130,7 @@ export default function HomeView({ state }: TournamentHook) {
                     )}
                     {match.manOfMatch && (
                       <div className="mt-1.5 flex items-center gap-1.5">
-                        <span className="text-xs">🏅</span>
+                        <span className="text-[10px] font-semibold text-gray-500 shrink-0">Homme du match</span>
                         <span className="text-xs font-semibold text-amber-400">{match.manOfMatch}</span>
                         {momTeam && <span className="text-[10px] text-gray-600">({momTeam.name})</span>}
                       </div>

@@ -23,11 +23,9 @@ function TBDSlot() {
 function ManOfMatch({ name, teamName }: { name: string; teamName?: string }) {
   return (
     <div className="mt-2 pt-2 border-t border-[#1e1e1e] flex items-center gap-2">
-      <span className="text-sm">🏅</span>
-      <div className="min-w-0">
-        <span className="text-xs font-semibold text-amber-400">{name}</span>
-        {teamName && <span className="text-[10px] text-gray-600 ml-1">({teamName})</span>}
-      </div>
+      <span className="text-[10px] font-semibold text-gray-500 shrink-0">Homme du match</span>
+      <span className="text-xs font-semibold text-amber-400">{name}</span>
+      {teamName && <span className="text-[10px] text-gray-600">({teamName})</span>}
     </div>
   );
 }
